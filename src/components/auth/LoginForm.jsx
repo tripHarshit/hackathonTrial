@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Check, Heart } from 'lucide-react';
 import FormInput from '../ui/FormInput';
 import Button from '../ui/Button';
 import { useFormValidation } from '../../hooks/useFormValidation';
+import { useAuthContext } from '../../context/AuthContext.jsx';
+import toast from 'react-hot-toast';
 
 const LoginForm = ({ onSubmit, loading = false }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { login } = useAuthContext();
+  const navigate = useNavigate();
 
   const {
     values,
@@ -27,12 +34,28 @@ const LoginForm = ({ onSubmit, loading = false }) => {
     e.preventDefault();
     
     if (validateForm()) {
+      setApiLoading(true);
+      setError('');
+      
       try {
-        await onSubmit(values);
+        await login(values.email, values.password);
         setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 2000);
+        toast.success('Welcome back!', {
+          style: {
+            background: '#fce7f3',
+            color: '#ec4899',
+          },
+        });
+        setTimeout(() => {
+          setShowSuccess(false);
+          navigate('/dashboard');
+        }, 1000);
       } catch (error) {
-        console.error('Login error:', error);
+        const errorMessage = error.response?.data?.message || 'Login failed';
+        setError(errorMessage);
+        toast.error('Login failed. Please try again!');
+      } finally {
+        setApiLoading(false);
       }
     }
   };
@@ -59,6 +82,17 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         </p>
       </motion.div>
 
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-2xl mb-4 animate-shake"
+        >
+          {error}
+        </motion.div>
+      )}
+
       {/* Email Input */}
       <FormInput
         label="Email Address"
@@ -70,6 +104,7 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         error={errors.email}
         touched={touched.email}
         required
+        disabled={apiLoading}
       />
 
       {/* Password Input */}
@@ -84,6 +119,7 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         touched={touched.password}
         required
         showPasswordToggle
+        disabled={apiLoading}
       />
 
       {/* Remember Me & Forgot Password */}
@@ -133,8 +169,9 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         variant="primary"
         size="lg"
         fullWidth
-        loading={loading}
+        loading={apiLoading}
         className="mt-8"
+        disabled={apiLoading}
       >
         {showSuccess ? (
           <motion.div

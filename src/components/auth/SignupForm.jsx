@@ -1,15 +1,22 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Check, AlertCircle, Heart, Sparkles } from 'lucide-react';
 import FormInput from '../ui/FormInput';
 import Button from '../ui/Button';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { validatePassword, getPasswordStrengthColor, getPasswordStrengthText } from '../../utils/validation';
+import { useAuthContext } from '../../context/AuthContext.jsx';
+import toast from 'react-hot-toast';
 
 const SignupForm = ({ onSubmit, loading = false }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { signup } = useAuthContext();
+  const navigate = useNavigate();
 
   const {
     values,
@@ -45,20 +52,42 @@ const SignupForm = ({ onSubmit, loading = false }) => {
     e.preventDefault();
     
     if (!termsAccepted) {
-      alert('Please accept the terms and conditions');
+      toast.error('Please accept the terms and conditions');
+      return;
+    }
+    
+    if (values.password !== values.confirmPassword) {
+      setError('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
     
     if (validateForm()) {
+      setApiLoading(true);
+      setError('');
+      
       try {
-        await onSubmit(values);
+        await signup(values);
         setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 2000);
+        toast.success('Welcome to our community!', {
+          style: {
+            background: '#fce7f3',
+            color: '#ec4899',
+          },
+        });
+        setTimeout(() => {
+          setShowSuccess(false);
+          navigate('/dashboard');
+        }, 1000);
       } catch (error) {
-        console.error('Signup error:', error);
+        const errorMessage = error.response?.data?.message || 'Signup failed';
+        setError(errorMessage);
+        toast.error('Signup failed. Please try again!');
+      } finally {
+        setApiLoading(false);
       }
     }
-  }, [termsAccepted, validateForm, onSubmit, values]);
+  }, [termsAccepted, validateForm, signup, values, navigate]);
 
   const PasswordStrengthIndicator = useCallback(() => {
     if (!values.password) return null;
@@ -148,6 +177,17 @@ const SignupForm = ({ onSubmit, loading = false }) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-2xl mb-4 animate-shake"
+        >
+          {error}
+        </motion.div>
+      )}
+
       {/* Welcome Message */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -173,6 +213,7 @@ const SignupForm = ({ onSubmit, loading = false }) => {
         error={errors.fullName}
         touched={touched.fullName}
         required
+        disabled={apiLoading}
       />
 
       {/* Email Input */}
@@ -186,6 +227,7 @@ const SignupForm = ({ onSubmit, loading = false }) => {
         error={errors.email}
         touched={touched.email}
         required
+        disabled={apiLoading}
       />
 
       {/* Password Input */}
@@ -201,6 +243,7 @@ const SignupForm = ({ onSubmit, loading = false }) => {
           touched={touched.password}
           required
           showPasswordToggle
+          disabled={apiLoading}
         />
         <AnimatePresence mode="wait">
           <PasswordStrengthIndicator key={values.password} />
@@ -219,6 +262,7 @@ const SignupForm = ({ onSubmit, loading = false }) => {
         touched={touched.confirmPassword}
         required
         showPasswordToggle
+        disabled={apiLoading}
       />
 
       {/* Terms & Conditions */}
@@ -272,8 +316,9 @@ const SignupForm = ({ onSubmit, loading = false }) => {
         variant="primary"
         size="lg"
         fullWidth
-        loading={loading}
+        loading={apiLoading}
         className="mt-8"
+        disabled={apiLoading}
       >
         {showSuccess ? (
           <motion.div

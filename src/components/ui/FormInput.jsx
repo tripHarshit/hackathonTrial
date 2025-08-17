@@ -71,11 +71,13 @@ const FormInput = ({
           onFocus={handleFocus}
           placeholder={placeholder}
           required={required}
+          disabled={props.disabled}
           className={`
             input-field pl-12 pr-4
             ${error && touched ? 'border-coral-300 ring-coral-300/50' : ''}
             ${!error && isFocused ? 'border-baby-pink-400 ring-baby-pink-400/50' : ''}
             ${showPasswordToggle ? 'pr-12' : ''}
+            ${props.disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}
           {...props}
         />

@@ -10,12 +10,7 @@ const LoadingSpinner = ({ size = 'md', className = '' }) => {
 
   return (
     <div className={`${sizeClasses[size]} ${className}`}>
-      <div className="relative w-full h-full">
-        <div className="absolute inset-0 rounded-full border-2 border-transparent bg-gradient-to-r from-primary-from to-primary-to animate-spin">
-          <div className="absolute inset-1 rounded-full bg-background"></div>
-        </div>
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-accent-from animate-ping"></div>
-      </div>
+      <div className="animate-spin rounded-full h-full w-full border-b-2 border-baby-pink-500"></div>
     </div>
   );
 };
