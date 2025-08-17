@@ -1,69 +1,84 @@
-@import "tailwindcss";
-/* :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer base {
+  body {
+    @apply bg-cute-gradient text-gray-800 font-inter;
+    overflow-x: hidden;
   }
-  a:hover {
-    color: #747bff;
+  
+  html {
+    scroll-behavior: smooth;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-baby-pink-500 to-baby-pink-600 bg-clip-text text-transparent;
   }
-} */
+  
+  .gradient-border {
+    @apply bg-gradient-to-r from-baby-pink-400 to-baby-pink-500 p-[1px];
+  }
+  
+  .glass-effect {
+    @apply bg-white/95 backdrop-blur-sm border border-baby-pink-200 shadow-2xl shadow-baby-pink-500/20;
+  }
+  
+  .input-focus {
+    @apply focus:ring-2 focus:ring-baby-pink-400 focus:border-transparent transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply bg-pink-button hover:scale-105 hover:shadow-lg hover:shadow-baby-pink-500/30 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 transform active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-to-r from-peach-200 to-lavender-200 hover:from-lavender-200 hover:to-peach-200 text-gray-700 font-semibold py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-peach-200/30 active:scale-95;
+  }
+  
+  .floating-label {
+    @apply absolute left-3 top-3 text-baby-pink-600 transition-all duration-300 pointer-events-none;
+  }
+  
+  .floating-label.focused {
+    @apply -top-2 left-2 text-xs text-baby-pink-500 bg-white px-2;
+  }
+  
+  .particle {
+    @apply absolute rounded-full opacity-30 animate-float;
+  }
+  
+  .geometric-shape {
+    @apply absolute opacity-20 animate-pulse-slow;
+  }
+  
+  .form-container {
+    @apply bg-white/95 backdrop-blur-sm border border-baby-pink-200 shadow-2xl shadow-baby-pink-500/20 rounded-3xl p-8;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-baby-pink-50 border border-baby-pink-200 rounded-2xl focus:ring-2 focus:ring-baby-pink-400 focus:border-transparent transition-all duration-300;
+  }
+  
+  .cute-link {
+    @apply text-baby-pink-600 hover:text-baby-pink-700 font-medium transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
